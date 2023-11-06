@@ -104,30 +104,36 @@ The time from the beginning of the cycle from which the plate and table begin to
 `int motorAccel = 12000;` 	- Acceleration of movement in manual control mode, steps/s²
 
 `int LiftDownSpeed = 800;`	- Speed of lowering the working plate, step/s;
+
 `int LiftDownAccel = 4000;`	- Acceleration when lowering the work plate, steps/sec²;
+
 `int LiftUpSpeed = 1600;`	- Speed of raising the working plate, steps/s;
+
 `int LiftUpAccel = 12000;`	- Acceleration when raising the work plate, steps/s²;
 
-int TiltDownSpeed = 3200; Swing table lowering speed, steps /sec
-int TiltDownAccel = 12000; Acceleration when lowering the swinging table, steps /s²
-int TiltUpSpeed = 1600; Oscillating table lowering speed, steps/s
-int TiltUpAccel = 8000; Acceleration when raising the swing table, steps/s²
+`int TiltDownSpeed = 3200;`	- Swing table lowering speed, steps/sec;
 
-bool LiftMotorReverse=false;
-Inverts the direction of movement for the work plate motor. By default, up is clockwise, down is counterclockwise.
-bool TiltMotorReverse=false;
-Inverts the direction of motion for the oscillating table motor
+`int TiltDownAccel = 12000;`- Acceleration when lowering the swinging table, steps/s²;
+
+`int TiltUpSpeed = 1600;`	- Oscillating table lowering speed, steps/s;
+
+`int TiltUpAccel = 8000;`	- Acceleration when raising the swing table, steps/s²;
+
+`bool LiftMotorReverse=false;` - Inverts the direction of movement for the work plate motor. By default, up is clockwise, down is counterclockwise;
+
+`bool TiltMotorReverse=false;` - Inverts the direction of motion for the oscillating table motor. 
+
 By default, up is clockwise, down is counterclockwise.
 
 Set of G-codes to control the printer:
-Z0 – stop the movement of the work table
-Z+/-50 – continuous movement of the work table
-Z+/-10 – one revolution of the work table motor (3200 steps)
-Z+/-1 – 1/200 rotation of the work table motor (16 steps)
-X0 – stop the movement of the tilting table
-X+/-100 – continuous movement of the tilting table
-Z+/-10 – Movement of the tilting table to extreme positions (upper and lower)
-Z+/-1 – 1/200 rotation of the tilting table motor (16 steps)
+* `Z0`	 	– stop the movement of the work table;
+* `Z+/-50`	– continuous movement of the work table
+* `Z+/-10`  – one revolution of the work table motor (3200 steps)
+* `Z+/-1`	– 1/200 rotation of the work table motor (16 steps)
+* `X0`		– stop the movement of the tilting table
+* `X+/-100`	– continuous movement of the tilting table
+* `Z+/-10`	– Movement of the tilting table to extreme positions (upper and lower)
+* `Z+/-1`	– 1/200 rotation of the tilting table motor (16 steps)
 
 ## Hardware
 * Arduino Mega – 1 pcs
@@ -139,13 +145,13 @@ Z+/-1 – 1/200 rotation of the tilting table motor (16 steps)
 * UV-projector – 1pcs
 
 ## Wiring diagram
- 
+![Wiring diagram]() 
 
 ## Possible further improvements
 * Adding additional control elements for printer (stop buttons, analogue parameter controllers etc)
 * Adding servo shutter to close projector objective (Reduces stray light). 
 * Printing without connecting to a PC (based on a set of photographs and control G-codes downloaded to external media)
- 
+
 ## Photos
 
  
