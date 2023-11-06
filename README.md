@@ -80,19 +80,19 @@ Print variables and their default settings for the Lift and Sequence cycle time(
 
 `int PlatenStepsPerLayer = 80;`
 
-	Steps to move one layer thickness. Calculated by dividing `Slice Thickness (mm)` from the Creation Workshop print settings by mm/step
-	For a layer of 0.05 mm, a screw with a pitch of 4 mm and 1/16 microstep = 0.05/0.00125=40
-	For a layer of 0.1 mm, a screw with a pitch of 4 mm and 1/16 microstep = 0.1/0.00125=80
+Steps to move one layer thickness. Calculated by dividing `Slice Thickness (mm)` from the Creation Workshop print settings by mm/step
+For a layer of 0.05 mm, a screw with a pitch of 4 mm and 1/16 microstep = 0.05/0.00125=40
+For a layer of 0.1 mm, a screw with a pitch of 4 mm and 1/16 microstep = 0.1/0.00125=80
 
 `int StepsToRaiseLowerBuildPlate = 3200;`
 
-	steps to raise the table between exposures
-	For a screw with a pitch of 4mm and 3200 steps per revolution - 3200 corresponds to a rise of 4mm (~2 sec at 1600step/sec, ~4 sec at 800step/sec)
+steps to raise the table between exposures
+For a screw with a pitch of 4mm and 3200 steps per revolution - 3200 corresponds to a rise of 4mm (~2 sec at 1600step/sec, ~4 sec at 800step/sec)
 
 `int StepsToRaiseLowerVat = 6400;`
 
-	Steps to raise/lower the rocking table
-	For a screw with a pitch of 10 mm and 3200 steps per revolution – 6400 corresponds to a rise of 20 mm (~2 sec at 3200step/sec, ~4 sec at 1600step/sec)
+Steps to raise/lower the rocking table
+For a screw with a pitch of 10 mm and 3200 steps per revolution – 6400 corresponds to a rise of 20 mm (~2 sec at 3200step/sec, ~4 sec at 1600step/sec)
 
 `int TimeForRaiseBuild=1200;`	- Time from the start of the cycle to start raising the work plate
 
@@ -111,19 +111,19 @@ The time from the beginning of the cycle from which the plate and table begin to
 
 `int LiftUpAccel = 12000;`	- Acceleration when raising the work plate, steps/s²;
 
-`int TiltDownSpeed = 3200;`	- swing table lowering speed, steps/sec;
+`int TiltDownSpeed = 3200;`	- Swinging table lowering speed, steps/sec;
 
 `int TiltDownAccel = 12000;`- Acceleration when lowering the swinging table, steps/s²;
 
-`int TiltUpSpeed = 1600;`	- Oscillating table lowering speed, steps/s;
+`int TiltUpSpeed = 1600;`	- Swinging table lowering speed, steps/s;
 
-`int TiltUpAccel = 8000;`	- Acceleration when raising the swing table, steps/s²;
+`int TiltUpAccel = 8000;`	- Acceleration when raising the swinging table, steps/s²;
 
 `bool LiftMotorReverse=false;` - Inverts the direction of movement for the work plate motor. By default, up is clockwise, down is counterclockwise;
 
-`bool TiltMotorReverse=false;` - Inverts the direction of motion for the oscillating table motor. 
-
-By default, up is clockwise, down is counterclockwise.
+`bool TiltMotorReverse=false;` - Inverts the direction of motion for the swinging table motor. 
+								false – up clockwise, down – counterclockwise.
+								true – down clockwise, up – counterclockwise.  
 
 Set of G-codes to control the printer:
 * `Z0`	 	– stop the movement of the work table;
