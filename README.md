@@ -1,5 +1,5 @@
 # Ultraviolet 3D Printer
-3D printer for print from resin with table tilting for better mixing and manual control of table lifting
+3D printer for print from resin with table swing for better mixing and manual control of table lifting
 
 The part is printed from a liquid resin that hardens under the influence of ultraviolet light.
 
@@ -10,7 +10,7 @@ CreationWorkshop software is responsible for generating images of layers, delive
 > [!WARNING]
 > To avoid eye damage, the printing area must be covered or protected by tinted glass that is opaque to ultraviolet light!
 
-Due to the fact that the thickness of the layers is quite small, after immersion the resin does not always reach the entire surface of the part. Because of this, pores or internal cavities may appear, which impairs the strength of the finished product. In order to avoid this, use the table tilting function during breaks between exposures; the table rocks several times, which allows the resin to be more evenly distributed over the entire surface of the printed part.
+Due to the fact that the thickness of the layers is quite small, after immersion the resin does not always reach the entire surface of the part. Because of this, pores or internal cavities may appear, which impairs the strength of the finished product. In order to avoid this, use the table Swing function during breaks between exposures; the table rocks several times, which allows the resin to be more evenly distributed over the entire surface of the printed part.
 
 ## Printer mechanics
 The main printing table is immersed in a container with a liquid resign and mounted on ball screw gears connected to stepper motors. This allows the table to be raised and lowered with high precision. 
@@ -21,7 +21,7 @@ An ultraviolet projector with appropriate optics is installed above the table, c
 
 The main controller is connected to the same PC via USB (with an emulated COM port) through which G-commands are transmitted to control the printer.
 
-The resin tank can be tilted at a small angle using a stepper motor. Limit switches are also installed in extreme positions to stop tilting
+The resin tank can be tilted at a small angle using a stepper motor. Limit switches are also installed in extreme positions to stop swinging
 To control the printer, a positions latching joystick is used, which allows you to raise and lower the table manually.
 
 In print mode, any movement of the joystick stops the current movement.
@@ -80,19 +80,19 @@ Print variables and their default settings for the Lift and Sequence cycle time(
 
 `int PlatenStepsPerLayer = 80;`
 
-  Steps to move one layer thickness. Calculated by dividing `Slice Thickness (mm)` from the Creation Workshop print settings by mm/step
-For a layer of 0.05 mm, a screw with a pitch of 4 mm and 1/16 microstep = 0.05/0.00125=40
-For a layer of 0.1 mm, a screw with a pitch of 4 mm and 1/16 microstep = 0.1/0.00125=80
+	Steps to move one layer thickness. Calculated by dividing `Slice Thickness (mm)` from the Creation Workshop print settings by mm/step
+	For a layer of 0.05 mm, a screw with a pitch of 4 mm and 1/16 microstep = 0.05/0.00125=40
+	For a layer of 0.1 mm, a screw with a pitch of 4 mm and 1/16 microstep = 0.1/0.00125=80
 
 `int StepsToRaiseLowerBuildPlate = 3200;`
 
-steps to raise the table between exposures
-  For a screw with a pitch of 4mm and 3200 steps per revolution - 3200 corresponds to a rise of 4mm (~2 sec at 1600step/sec, ~4 sec at 800step/sec)
+	steps to raise the table between exposures
+	For a screw with a pitch of 4mm and 3200 steps per revolution - 3200 corresponds to a rise of 4mm (~2 sec at 1600step/sec, ~4 sec at 800step/sec)
 
 `int StepsToRaiseLowerVat = 6400;`
 
-Steps to raise/lower the rocking table
-  For a screw with a pitch of 10 mm and 3200 steps per revolution – 6400 corresponds to a rise of 20 mm (~2 sec at 3200step/sec, ~4 sec at 1600step/sec)
+	Steps to raise/lower the rocking table
+	For a screw with a pitch of 10 mm and 3200 steps per revolution – 6400 corresponds to a rise of 20 mm (~2 sec at 3200step/sec, ~4 sec at 1600step/sec)
 
 `int TimeForRaiseBuild=1200;`	- Time from the start of the cycle to start raising the work plate
 
@@ -111,7 +111,7 @@ The time from the beginning of the cycle from which the plate and table begin to
 
 `int LiftUpAccel = 12000;`	- Acceleration when raising the work plate, steps/s²;
 
-`int TiltDownSpeed = 3200;`	- Swing table lowering speed, steps/sec;
+`int TiltDownSpeed = 3200;`	- swing table lowering speed, steps/sec;
 
 `int TiltDownAccel = 12000;`- Acceleration when lowering the swinging table, steps/s²;
 
@@ -130,10 +130,10 @@ Set of G-codes to control the printer:
 * `Z+/-50`	– continuous movement of the work table
 * `Z+/-10`  – one revolution of the work table motor (3200 steps)
 * `Z+/-1`	– 1/200 rotation of the work table motor (16 steps)
-* `X0`		– stop the movement of the tilting table
-* `X+/-100`	– continuous movement of the tilting table
-* `Z+/-10`	– Movement of the tilting table to extreme positions (upper and lower)
-* `Z+/-1`	– 1/200 rotation of the tilting table motor (16 steps)
+* `X0`		– stop the movement of the Swing table
+* `X+/-100`	– continuous movement of the Swing table
+* `Z+/-10`	– Movement of the Swing table to extreme positions (upper and lower)
+* `Z+/-1`	– 1/200 rotation of the Swing table motor (16 steps)
 
 ## Hardware
 * Arduino Mega – 1 pcs

@@ -1,72 +1,70 @@
-// Прошивка для UV принтера
-// использовать совместно с Creation Workshop
+// UV-3D printer firmware
+// 3D printer for print from resin with table swing for better mixing and manual control of table lifting
+
+// To use with Creation Workshop profile mUVe.1.3.slicing
 
 #include <Servo.h> 
 Servo servo;  
 
-// Винт поднятия стола шаг 4мм, 3200 микрошагов на оборот - 800 шагов на мм, 0,00125 мм/шаг
-// Дистанция 200мм - 50 оборотов
-// Для скорости 1600 шагов/сек - 0,5 об/сек - 2мм/сек (100 сек полный цикл)
+// Table lift screw pitch 4mm, 3200 microsteps per revolution - 800 steps per mm, 0.00125 mm/step
+// Distance 200mm - 50 revolutions
+// For a speed of 1600 steps/sec - 0.5 rps - 2mm/sec (100 sec full cycle)
 
-// Винт поднятия стола - дистанция 65мм, шаг 10мм, 3200 микрошагов на оборот - 320 шагов на мм, 0,00312 мм/шаг
-// Дистанция 65мм - 6,5 оборотов
-// Для скорости 1600 шагов/сек - 0,5 об/сек - 5 мм/сек (13 сек полный цикл)
+// Table lift screw - distance 65mm, pitch 10mm, 3200 microsteps per revolution - 320 steps per mm, 0.00312 mm/step
+// Distance 65mm - 6.5 turns
+// For a speed of 1600 steps/sec - 0.5 rps - 5 mm/sec (13 sec full cycle)
 
-int PlatenStepsPerLayer = 80; // Шагов для перемещения на толщину одного слоя. Вычисляется делением Slice Thickness (mm) из настроек печати
-//  Creation Workshop на величину мм/шаг 
-// Для слоя 0,05 мм, винта с шагом 4мм и 1/16 микрошага = 0,05/0,00125=40
-// Для слоя 0,1 мм, винта с шагом 4мм и 1/16 микрошага = 0,1/0,00125=80
+int PlatenStepsPerLayer = 80; 
+// Steps to move one layer thick. Calculated by dividing Slice Thickness (mm) from the print settings
+// Creation Workshop by mm/step
+// For a layer of 0.05 mm, a screw with a pitch of 4 mm and 1/16 microstep = 0.05/0.00125=40
+// For a layer of 0.1 mm, a screw with a pitch of 4 mm and 1/16 microsteps = 0.1/0.00125=80
 
-int StepsToRaiseLowerBuildPlate = 3200; // шагов на поднятия стола между экспозициями
-// Для винта с шагом 4мм и 3200 шагов на оборот - 3200 соответствует поднятию на 4мм (~2 сек при 1600шаг/сек, ~4 сек при 800шаг/сек)
-
-// steps to raise/lower the build plate between exposures. I use 400 step per revolution motors microstepped times 16 for 6400 steps per revolution.
-int StepsToRaiseLowerVat = 6400; // Шагов для поднятия/опускания качающегося стола
-// Для винта с шагом 10 мм и 3200 шагов на оборот - 6400 соответствует опусканию на 20мм (~2 сек при 3200шаг/сек, ~4 сек при 1600шаг/сек)
+int StepsToRaiseLowerBuildPlate = 3200; 
+// steps to raise the table between exposures
+// For a screw with a pitch of 4mm and 3200 steps per revolution - 3200 corresponds to a rise of 4mm (~2 sec at 1600step/sec, ~4 sec at 800step/sec)
 
 
-int TimeForTilt=1000;        // Время для поднятия/опускания качающегося стола 
+int StepsToRaiseLowerVat = 6400; 
+// Steps to raise/lower the rocking table
+// For a screw with a pitch of 10 mm and 3200 steps per revolution - 6400 corresponds to a lowering of 20 mm (~2 sec at 3200step/sec, ~4 sec at 1600step/sec)
 
-int TimeForRaiseBuild=1200;  // Время от начала цикла, для начала поднятия рабочей плиты 
-int TimeForGoZeroPos=3400;   // Время от начала цикла, с которого плита и стол начинают возвращаться 
-                              // в рабочее положение перед началом следующего цикла 
+
+int TimeForTilt=1000;        // Time to raise/lower the swing table
+
+int TimeForRaiseBuild=1200;  // Time from the start of the cycle to start raising the work plate
+int TimeForGoZeroPos=3400;   // Time from the beginning of the cycle from which the plate and table begin to return
+                             // to working position before starting the next cycle
+                             // should not work before the work plate rises to the top position,
+                             // and the swinging table will fall to the bottom
                               
-                              // не должно сработать раньше, чем рабочая плита подымется в верхнее положение, 
-                              // а качающийся стол - опустится в нижнее 
-                              
-int motorSpeed = 3200; //Скорость перемещения в режиме ручного управления, шак/сек
-int motorAccel = 12000; //Ускорение перемещения в режиме ручного управления, шак/сек2
+int motorSpeed = 3200; 		// Movement speed in manual control mode, steps/s
+int motorAccel = 12000;		// Acceleration of movement in manual control mode, steps/s²
 
-int LiftDownSpeed = 800;   // Скорость опускания рабочей плиты, шак/сек
-int LiftDownAccel = 4000; // Ускорение при опускания рабочей плиты, шак/сек2
-int LiftUpSpeed = 1600;  // Скорость поднятия рабочей плиты, шак/сек
-int LiftUpAccel = 12000; // Ускорение при поднятии рабочей плиты, шак/сек2
+int LiftDownSpeed = 800;	// Speed of lowering the working plate, step/s;
+int LiftDownAccel = 4000;	// Acceleration when lowering the work plate, steps/sec²;
+int LiftUpSpeed = 1600;		// Speed of raising the working plate, steps/s;
+int LiftUpAccel = 12000;	// Acceleration when raising the work plate, steps/s²;
 
-int TiltDownSpeed = 3200; // Скорость опускания качающегося стола , шак/сек
-int TiltDownAccel = 12000; // Ускорение при опускании качающегося стола , шак/сек2
-int TiltUpSpeed = 1600;  // Скорость опускания качающегося стола, шак/сек
-int TiltUpAccel = 8000; // Ускорение при поднятии качающегося стола, шак/сек2 
+int TiltDownSpeed = 3200;	// Swing table lowering speed, steps/sec;
+int TiltDownAccel = 12000;	// Acceleration when lowering the swinging table, steps/s²;
+int TiltUpSpeed = 1600;		// Swinging table lowering speed, steps/s;
+int TiltUpAccel = 8000;		// Acceleration when raising the swinging table, steps/s²;
 
-bool LiftMotorReverse=false;  // Инвертирует направление движения для двигателя  рабочей плиты. 
-bool TiltMotorReverse=false;  // Инвертирует направление движения для двигателя качающегося стола
-                              // false – вверх по часовой стрелке, вниз – против.
-                              // true – вниз по часовой стрелке, вверх – против.   
+bool LiftMotorReverse=false;  	// Inverts the direction of movement for the work plate motor
+bool TiltMotorReverse=false; 	// Inverts the direction of motion for the swinging table motor
+								// false – up clockwise, down – counterclockwise.
+								// true – down clockwise, up – counterclockwise.  
                                                       
-int servoPin = 6; //Пин подключения сервозаслонки объектива (при использовании)
-int shutterclosed = 45; // Положение сервозаслонки объектива при закрытии 
-int shutteropen = 0; // Положение сервозаслонки объектива при открытии 
+int servoPin = 6; 		//pin for connecting the lens servo shutter (if used)
+int shutterclosed = 45;	// Position of the lens servo shutter when closing
+int shutteropen = 0; 	// Position of the lens servo shutter when opening
 
 
 #include <AccelStepper.h>
 
 
 
-/*int TiltDownSpeed = 400; // vat tilt down speed
-int TiltDownAccel = 200; // vat tilt down acceleration
-
-int TiltUpSpeed = 1600; // vat tilt up speed
-int TiltUpAccel = 1600; // vat tilt up acceleration
-*/
 
 bool LiftUp=false;
 bool LiftDown=false;
@@ -93,21 +91,21 @@ char sdataBuffer[SDATABUFFERSIZE+1]; //Add 1 for NULL terminator
 byte sdataBufferIndex = 0;
 boolean sstoreString = false; // flag to put the data in our buffer
 
-#define xtop_limit 2 //концевик для качающегося стола верхний X
-#define xbot_limit 3 //концевик для качающегося стола нижний верхний X
+#define xtop_limit 2	// top limit switch for tilting table (X-axis)
+#define xbot_limit 3 	// bottom limit switch for tilting table (X-axis)
 
-#define ztop_limit 19 //концевик для поднятия плиты верхний Z
-#define zbot_limit 18 ////концевик для поднятия плиты нижний Z
+#define ztop_limit 19	// top limit switch for lifting table (Z-axis)
+#define zbot_limit 18	// bottom limit switch for lifting table (Z-axis)
 
-#define signal_led 13 // general purpose signal, blinks on board led
-#define UVLED 12 // used for projector modification light sources like uv leds
+#define signal_led 13	 // general purpose signal, blinks on board led
+#define UVLED 12		 // used for projector modification light sources like uv leds
 
 
-int SIGNALLED_OFF = LOW; // off
-int SIGNALLED_ON = HIGH; // on
+int SIGNALLED_OFF = LOW; 	// off
+int SIGNALLED_ON = HIGH; 	// on
 
-int UVLED_OFF = LOW; // off
-int UVLED_ON = HIGH; // on
+int UVLED_OFF = LOW; 	// off
+int UVLED_ON = HIGH; 	// on
 
 int Zpos=0;
 int ZabsPos=0;
@@ -227,42 +225,42 @@ void loop()
             {
           Serial.println("ok"); //acknowlege the command
 
-          // Начало экспозиции 
+          // Start of the exposition
           if (String(sdataBuffer).substring(1,21) == "LAYER-ON############") 
-          //включаем подсветку проектора (если есть управление)
+			//turn on the projector backlight (if there is control)
           {
             digitalWrite(UVLED, UVLED_ON);
             servo.write(shutteropen); // open shutter
           }
-          // режим опускания качающегося стола с выключенным изображением на проекторе
+          // swing table lowering mode with the image on the projector turned off
           else if (String(sdataBuffer).substring(1,21) == "LAYER-OFF-TILT-VAT##") // 
           {
             if ( printing3d)
             {
               digitalWrite(signal_led, SIGNALLED_ON);
-              LayerCycleTimer = millis();  // запускаем таймер цикла для текущего слоя
-              CycleLayer = true;  // Начинаем цикл для текущего слоя
+              LayerCycleTimer = millis();  // start the loop timer for the current layer
+              CycleLayer = true;  // Start the loop for the current layer
               // begin cycling vat and platen
-              servo.write(shutterclosed); // закрываем заслонку объектива
+              servo.write(shutterclosed); // close the lens shutter
               
-              digitalWrite(UVLED, UVLED_OFF); //выключаем подсветку проектора (если есть управление)
+              digitalWrite(UVLED, UVLED_OFF); //turn off the projector backlight (if there is control)
               TiltStepper.setMaxSpeed(TiltDownSpeed);
               TiltStepper.setAcceleration(TiltDownAccel);
-              TiltStepper.moveTo(StepsToRaiseLowerVat * -1); //Опускаем качающийся стол
-              RaiseBuildPlate = true;     // включаем поднятие рабочей плиты через нужный интервал
+              TiltStepper.moveTo(StepsToRaiseLowerVat * -1); //Lowering the swing table
+              RaiseBuildPlate = true;     // turn on the raising of the work plate at the required interval
             }
           }
           
           else if (String(sdataBuffer).substring(1,19) == "LIFT-SEQUENCE-TIME")
-          // Установка переменной  Lift and Sequence Time
-          // см. creation workshop > slice profile config > Options > Lift and Sequence Time (ms)
+			// Set the Lift and Sequence Time variable
+			// see creation workshop > slice profile config > Options > Lift and Sequence Time (ms)
           {
             LayerCycle_TIME_STRING = String(sdataBuffer).substring(21,26);
             LayerCycle_TIME = LayerCycle_TIME_STRING.toInt();
             Serial.print("Set LayerCycle TIME to ");
             Serial.println(LayerCycle_TIME);
           }
-          // Начало печати, установка всех позиций в ноль
+          // Start printing, set all positions to zero
           else if (String(sdataBuffer).substring(1,21) == "INIT################") // reset position, open shutter
           {
               printing3d = true;
@@ -284,7 +282,7 @@ void loop()
   
             servo.write(shutteropen); // open shutter
           }
-          // Конец печати
+          // Finishing printing
           else if (String(sdataBuffer).substring(1,21) == "END#################") // reset position, open shutter
           {
               printing3d = false;
@@ -294,12 +292,12 @@ void loop()
               LiftStepper.stop();
               servo.write(shutterclosed); // close shutter
           }
-          // Ручное упраление - опускание качающегося стола 
-          else if (String(sdataBuffer).substring(0,6) == "G28 X0") // Поднять качающийся стол
+          // Manual control - lowering the swing table
+          else if (String(sdataBuffer).substring(0,6) == "G28 X0") // Stop raising the swing table
           {
             TiltStepper.stop();
           }
-          else if (String(sdataBuffer).substring(0,7) == "G1 X100") // Поднять качающийся стол
+          else if (String(sdataBuffer).substring(0,7) == "G1 X100") // Raise the swing table
           {
             if (tilt_top_limit == false) // not already on bottom limit
               {
@@ -309,7 +307,7 @@ void loop()
                 TiltStepper.move(100000); // move towards bottom limit
               }
           }
-          else if (String(sdataBuffer).substring(0,8) == "G1 X-100") // Опустить качающийся стол
+          else if (String(sdataBuffer).substring(0,8) == "G1 X-100") // Lower the swing table
           {
             if (tilt_bottom_limit == false) // not already on bottom limit
               {
@@ -319,15 +317,12 @@ void loop()
                 TiltStepper.move(-100000); // move towards bottom limit
               }
           }
-          // Ручное упраление - опускание качающегося стола 
-          else if (String(sdataBuffer).substring(0,7) == "G1 X10 ") // Поднять качающийся стол
+          // Manual control - lowering the swing table
+          else if (String(sdataBuffer).substring(0,7) == "G1 X10 ") // Raise the swing table
           {
             if (tilt_top_limit == false) // not already on bottom limit
               {
                 Xpos=TiltStepper.currentPosition();
-                /*Serial.print("Current X position: ");
-                Serial.print(Xpos);
-                Serial.print(" begint run to 0");*/
                 TiltStepper.setMaxSpeed(motorSpeed);
                 TiltStepper.setAcceleration(motorAccel);
                 TiltStepper.moveTo(0); 
@@ -335,21 +330,18 @@ void loop()
               }
           }
           
-          else if (String(sdataBuffer).substring(0,8) == "G1 X-10 ") // Опустить качающийся стол
+          else if (String(sdataBuffer).substring(0,8) == "G1 X-10 ") // Lower the swing table
           {
             if (tilt_bottom_limit == false) // not already on bottom limit
               {
                 Xpos=TiltStepper.currentPosition();
-                /*Serial.print("Current X position: ");
-                Serial.print(Xpos);
-                Serial.print(" begint run to bottom");*/
                 TiltStepper.setMaxSpeed(motorSpeed);
                 TiltStepper.setAcceleration(motorAccel);
                 TiltStepper.moveTo(StepsToRaiseLowerVat*(-1)); 
               }
           }
-          // Ручное упраление - опускание качающегося стола 
-          else if (String(sdataBuffer).substring(0,6) == "G1 X1 ") // Поднять качающийся стол
+          // Manual control - lowering the swing table
+          else if (String(sdataBuffer).substring(0,6) == "G1 X1 ") // Raise the swing table
           {
             if (tilt_top_limit == false) // not already on bottom limit
               {
@@ -364,24 +356,22 @@ void loop()
               }
           }
           
-          else if (String(sdataBuffer).substring(0,7) == "G1 X-1 ") // Опустить качающийся стол
+          else if (String(sdataBuffer).substring(0,7) == "G1 X-1 ") // Lower the swing table
           {
             if (tilt_bottom_limit == false) // not already on bottom limit
               {
                 Xpos=TiltStepper.currentPosition();
-                /*Serial.print("Current X position: ");
-                Serial.print(Xpos);
-                Serial.print(" begint run to bottom");*/
+
                 TiltStepper.setMaxSpeed(motorSpeed);
                 TiltStepper.setAcceleration(motorAccel);
                 TiltStepper.move(-16); 
               }
           }
-          else if (String(sdataBuffer).substring(0,6) == "G28 Z0") // Поднять качающийся стол
+          else if (String(sdataBuffer).substring(0,6) == "G28 Z0") // Raise the swing table
           {
             LiftStepper.stop();
           }
-          // Ручное упраление - опускание стола на 1 шаг шаговика
+          // Manual control - lowering the table by 1 step of the stepper
           else if (String(sdataBuffer).substring(0,7) == "G1 Z-1 ") // bottom limit (vat floor)
           {
               if (on_bottom_limit == false) // not already on bottom limit
@@ -395,7 +385,7 @@ void loop()
           {
               if (on_top_limit == false) // not already on bottom limit
                 {
-                  LiftStepper.setMaxSpeed(motorSpeed);  //2000 шагов в сек - 
+                  LiftStepper.setMaxSpeed(motorSpeed);  
                   LiftStepper.setAcceleration(motorAccel);
                   LiftStepper.move(16);
                 }
@@ -405,19 +395,19 @@ void loop()
           {
                 if (on_top_limit == false) // not already on bottom limit
                   {
-                    LiftStepper.setMaxSpeed(motorSpeed);  //3200 шагов в сек - оборот в сек
+                    LiftStepper.setMaxSpeed(motorSpeed); 
                     LiftStepper.setAcceleration(motorAccel);
-                    LiftStepper.move(100000); // В крайнее положение
+                    LiftStepper.move(100000); // To extreme position
                   }
           }
-          // Ручное упраление - опускание стола на 1 оборот
+          // Manual control - table lowering 1 revolution
           else if (String(sdataBuffer).substring(0,8) == "G1 Z-50 ") // bottom limit (vat floor)
           {
                 if (on_bottom_limit == false) // not already on bottom limit
                   {
-                    LiftStepper.setMaxSpeed(motorSpeed);  //3200 шагов в сек - оборот в сек
+                    LiftStepper.setMaxSpeed(motorSpeed); 
                     LiftStepper.setAcceleration(motorAccel);
-                    LiftStepper.move(-100000); // В крайнее положение
+                    LiftStepper.move(-100000);  // To extreme position
                   }
           }                      
           else if (String(sdataBuffer).substring(0,7) == "G1 Z-10") // bottom limit (vat floor)
@@ -453,7 +443,7 @@ void loop()
         }
       }
     }
-       // Режим поднятия стола 
+       // Table raise mode
       if (RaiseBuildPlate == true)
       {
           if (LayerCycleTimer + TimeForRaiseBuild < millis())  //time to raise build plate )
@@ -474,7 +464,7 @@ void loop()
 
         if (CycleLayer == true)
         {
-          if (LayerCycleTimer + TimeForGoZeroPos < millis()) // возвращаем в нулевое положение плиту и стол
+          if (LayerCycleTimer + TimeForGoZeroPos < millis()) // return the plate and table to the zero position
           {
               //Serial.println("Time to return Build Plate and tilt to 0");
               LiftStepper.setMaxSpeed(LiftDownSpeed);
@@ -485,7 +475,7 @@ void loop()
               TiltStepper.moveTo(0); // un-tilt the vat
           }
         
-          if (LayerCycleTimer + LayerCycle_TIME < millis()) // Конец цикла для текущего слоя
+          if (LayerCycleTimer + LayerCycle_TIME < millis()) // End of loop for current layer
           {
                 Serial.println("Current cycle End");
                 servo.write(shutteropen); // open shutter
@@ -495,8 +485,8 @@ void loop()
       }
 
       
-      // Обработка событий верхнего концевика рабочей плиты
-      if (digitalRead(ztop_limit) == LOW and on_top_limit == false) //верхний концевик рабочей плиты  нажат
+      // Processing events of the upper end of the work plate
+      if (digitalRead(ztop_limit) == LOW and on_top_limit == false) //the upper limit switch of the work plate is pressed
       {
           digitalWrite(signal_led,HIGH);
           Serial.println("Z top limit STOP");     
@@ -522,19 +512,19 @@ void loop()
                 LiftStepper.stop();        
            }
       }
-      if (digitalRead(ztop_limit) == HIGH and on_top_limit == true) // верхний концевик рабочей плиты отпущен
+      if (digitalRead(ztop_limit) == HIGH and on_top_limit == true) // the upper limit switch of the working plate is released
       {
         on_top_limit = false;
         digitalWrite(signal_led,LOW);
         Serial.println("Z top limit NORMAL");
       }
 
-      // Обработка событий нижнего концевика рабочей плиты
-      if (digitalRead(zbot_limit) == LOW and on_bottom_limit == false) // нижний концевик рабочей плиты нажат
+      // Processing events of the lower end of the work plate
+      if (digitalRead(zbot_limit) == LOW and on_bottom_limit == false) // the lower limit switch of the work plate is pressed
       {
           digitalWrite(signal_led,HIGH);
           Serial.println("Z bottom limit STOP");
-          if (printing3d == false)    // Если мы не в режиме печати
+          if (printing3d == false)    // If we are not in print mode
             {
               digitalWrite(signal_led,HIGH);
               
@@ -542,12 +532,12 @@ void loop()
               if (LiftDown) LiftStepper.stop();
               
               delay(250);
-              //LiftStepper.moveTo(0); 
+ 
               LiftStepper.setCurrentPosition(0);
               LiftStepper.setMaxSpeed(motorSpeed);
               LiftStepper.setAcceleration(motorAccel);
 
-              // Подымаем качающийся стол
+              //Raising the swing table
               TiltStepper.setMaxSpeed(motorSpeed);
               TiltStepper.setAcceleration(motorAccel);
               TiltStepper.move(30000) ;
@@ -558,29 +548,27 @@ void loop()
             }
       }
 
-    if (digitalRead(zbot_limit) == HIGH and on_bottom_limit == true) // нижний концевик рабочей плиты отпущен
+    if (digitalRead(zbot_limit) == HIGH and on_bottom_limit == true) //the lower limit switch of the working plate is released
       {
       Serial.println("Z bottom limit NORMAL");
       on_bottom_limit = false;
       digitalWrite(signal_led,LOW);
       }
 
-     // Обработка событий верхнего концевика качающегося стола
-    if (digitalRead(xtop_limit) == LOW and tilt_top_limit == false) // верхнеий концевик качающегося стола нажат
+     // Handling events of the upper limit switch of the swinging table
+    if (digitalRead(xtop_limit) == LOW and tilt_top_limit == false) // The upper limit switch of the tilting table is pressed
       {
         tilt_top_limit=true;
         Serial.println("Tilt top limit STOP");
-        if (printing3d == false)    // Если мы не в режиме печати
+        if (printing3d == false)    // If we are not in print mode
         {
         TiltStepper.setCurrentPosition(0);
         digitalWrite(signal_led,LOW);
-        /*Xpos=TiltStepper.currentPosition();
-        Serial.print("Current X position: ");
-        Serial.println(Xpos);*/
+
         TiltStepper.stop();
         }
       }
-      if (digitalRead(xtop_limit) == HIGH and tilt_top_limit == true) //верхнеий концевик качающегося стола отпущен
+      if (digitalRead(xtop_limit) == HIGH and tilt_top_limit == true) //The upper limit switch of the tilting table is released
       {
          tilt_top_limit=false;
          Serial.println("Tilt top limit NORMAL");
@@ -588,41 +576,33 @@ void loop()
       }
       // Обработка событий нижнего концевика качающегося стола
 
-      if (digitalRead(xbot_limit) == LOW and tilt_bottom_limit == false) //нижний концевик качающегося стола  нажат
+      if (digitalRead(xbot_limit) == LOW and tilt_bottom_limit == false) //the lower limit switch of the tilting table is pressed
       {
-        if (printing3d == false)    // Если мы не в режиме печати
+        if (printing3d == false)    // If we are not in print mode
         {
           tilt_bottom_limit=true;
           digitalWrite(signal_led,LOW);
           Serial.println("Tilt bottom limit STOP");
-          /*Xpos=TiltStepper.currentPosition();
-          Serial.print("Current X position: ");
-          Serial.print(Xpos);*/
           TiltStepper.stop();
         }
       }
-      if (digitalRead(xbot_limit) == HIGH and tilt_bottom_limit == true) //нижний концевик качающегося стола отпущен
+      if (digitalRead(xbot_limit) == HIGH and tilt_bottom_limit == true) //the lower limit switch of the tilting table is released
       {
          Serial.println("Tilt bottom limit NORMAL");
          tilt_bottom_limit=false;
          digitalWrite(signal_led,LOW);
       }
 
-// Кнопка вверх отпущена
+// Up button released
 if ((digitalRead(UpZButtontPin) == HIGH)&&(UpZButtonLast==true))
 {
   Serial.println("Up button Stop");
-  /*HomingBuildPlateBottom = false;
-  if (LiftUp) 
-  {
-    LiftStepper.stop();
-    LiftUp = false;
-  }*/
+
   if (!printing3d) 
   {
-    if (LiftDown)   // Если в режиме перемещения вниз
+    if (LiftDown)   // If in downward mode
     {
-      LiftDown=false;       //Останавливаемся
+      LiftDown=false;       // Stop
       LiftStepper.stop();
     }
     else
@@ -630,7 +610,7 @@ if ((digitalRead(UpZButtontPin) == HIGH)&&(UpZButtonLast==true))
           {
             
             LiftUp = true;
-            //HomingBuildPlateTop = true;
+
             LiftStepper.setMaxSpeed(2000);
             LiftStepper.setAcceleration(12000);
             LiftStepper.move(100000); // move towards bottom limit
@@ -642,46 +622,26 @@ if ((digitalRead(UpZButtontPin) == HIGH)&&(UpZButtonLast==true))
   }
   UpZButtonLast=false;
 }
-// Кнопка вверх нажата
+// Up button pressed
     if ((digitalRead(UpZButtontPin) == LOW)&&(UpZButtonLast==false))
     {
       Serial.println("Up button ");
-      if (printing3d) // В режиме печати останавливает печать
+      if (printing3d) // In print mode, stops printing
       {
         printing3d = false;
         LiftStepper.stop();
         TiltStepper.stop();
       }
-      /*else
-      {
-        if (on_top_limit == false) // not already on bottom limit
-          {
-            
-            LiftUp = true;
-            //HomingBuildPlateTop = true;
-            LiftStepper.setMaxSpeed(2000);
-            LiftStepper.setAcceleration(12000);
-            LiftStepper.move(100000); // move towards bottom limit
-          }
-         else 
-         {
-            LiftStepper.stop();
-         }
-      }*/
+     
       UpZButtonLast=true;
     }
     
-    // Кнопка вниз отпущена
+    // Down button released
     if ((digitalRead(DownZButtontPin) == HIGH)&&(DownZButtonLast==true))
     {
       Serial.println("Down button Stop");
-     /* HomingBuildPlateBottom = false;
-      if (LiftDown) 
-      {
-        LiftStepper.stop();
-        LiftDown = false;
-      }*/
-      if (!printing3d)    // Если не в режиме печати
+
+      if (!printing3d)    //If not in print mode
       {
         if (LiftUp)
         {
@@ -703,30 +663,17 @@ if ((digitalRead(UpZButtontPin) == HIGH)&&(UpZButtonLast==true))
       }
       DownZButtonLast=false;
     }
-  // Кнопка вниз нажата
+  // Down button pressed
   if ((digitalRead(DownZButtontPin) == LOW)&&(DownZButtonLast==false))
     {
       Serial.println("Down button");
-      if (printing3d)    // В режиме печати останавливает печать
+      if (printing3d)    // In print mode, stops printing
       {
         printing3d = false;
         LiftStepper.stop();
         TiltStepper.stop();
       }
-      /*else
-      {
-        if (on_bottom_limit == false) // not already on bottom limit
-          {
-            LiftDown = true;
-            LiftStepper.setMaxSpeed(2000);
-            LiftStepper.setAcceleration(12000);
-            LiftStepper.move(-100000); // move towards bottom limit
-          }
-         else 
-         {
-            LiftStepper.stop();
-         }
-      }*/
+
       DownZButtonLast=true;
     }
       
