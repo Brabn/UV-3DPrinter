@@ -145,7 +145,8 @@ Set of G-codes to control the printer:
 * UV-projector – 1pcs
 
 ## Wiring diagram
-![Wiring diagram]() 
+
+![Wiring diagram](https://github.com/Brabn/UV-3DPrinter/blob/main/Wiring_diagram/UV-3DPrinter.Wiring_diagram.jpg) 
 
 ## Possible further improvements
 * Adding additional control elements for printer (stop buttons, analogue parameter controllers etc)
@@ -154,7 +155,10 @@ Set of G-codes to control the printer:
 
 ## Photos
 
- 
+![Main components assembled for testing](https://github.com/Brabn/UV-3DPrinter/blob/main/Photo/UV-3DPrinter.UV-3DPrinter.Components.jpg) 
+
+![Main controller](https://github.com/Brabn/UV-3DPrinter/blob/main/Photo/UV-3DPrinter.UV-3DPrinter.MainController.jpg) 
+
  
  
 
