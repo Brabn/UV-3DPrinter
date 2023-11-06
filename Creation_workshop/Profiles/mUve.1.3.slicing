@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SliceBuildConfig FileVersion="2">
+  <DotsPermmX>102.4</DotsPermmX>
+  <DotsPermmY>76.8</DotsPermmY>
+  <XResolution>1024</XResolution>
+  <YResolution>768</YResolution>
+  <BlankTime>8000</BlankTime>
+  <PlatformTemp>75</PlatformTemp>
+  <ExportSVG>0</ExportSVG>
+  <Export>False</Export>
+  <ExportPNG>False</ExportPNG>
+  <XOffset>0</XOffset>
+  <YOffset>0</YOffset>
+  <Direction>Bottom_Up</Direction>
+  <LiftDistance>4</LiftDistance>
+  <SlideTiltValue>8</SlideTiltValue>
+  <AntiAliasing>False</AntiAliasing>
+  <UseMainLiftGCode>False</UseMainLiftGCode>
+  <AntiAliasingValue>1.5</AntiAliasingValue>
+  <LiftFeedRate>120</LiftFeedRate>
+  <BottomLiftFeedRate>300</BottomLiftFeedRate>
+  <LiftRetractRate>300</LiftRetractRate>
+  <ExportOption>ZIP</ExportOption>
+  <RenderOutlines>False</RenderOutlines>
+  <OutlineWidth_Inset>2</OutlineWidth_Inset>
+  <OutlineWidth_Outset>0</OutlineWidth_Outset>
+  <FlipX>False</FlipX>
+  <FlipY>False</FlipY>
+  <Notes>
+  </Notes>
+  <GCodeHeader>;********** Header Start ********
+&lt;INIT################
+&lt;LIFT-SEQUENCE-TIME&gt; %d$BlankTime
+;********** Header End **********
+</GCodeHeader>
+  <GCodeFooter>;********** Footer Start ********
+&lt;END#################
+;********** Footer End ********
+</GCodeFooter>
+  <GCodePreslice>;********** Pre-Slice Start ********
+;&lt;Delay&gt; 250
+&lt;LAYER-ON############&gt;
+;********** Pre-Slice End **********
+</GCodePreslice>
+  <GCodeLift>;********** Lift Sequence ********
+;&lt;Delay&gt; 250
+&lt;LAYER-OFF-TILT-VAT##&gt;
+;&lt;Delay&gt; %d$BlankTime
+;********** Lift Sequence **********
+</GCodeLift>
+  <GCodeLayer>;********** Layer Start ********
+;Here you can set any G or M-Code which should be executed per-layer during the build process
+&lt;slice&gt; $CURSLICE
+G91 ;Relative Positioning
+M17 ;Enable motors
+;********** Layer End **********
+</GCodeLayer>
+  <SelectedInk>Default</SelectedInk>
+  <InkConfig>
+    <Name>Default</Name>
+    <SliceHeight>0.100000001490116</SliceHeight>
+    <LayerTime>1000</LayerTime>
+    <FirstLayerTime>5000</FirstLayerTime>
+    <NumberofBottomLayers>3</NumberofBottomLayers>
+    <ResinPriceL>0</ResinPriceL>
+  </InkConfig>
+  <MinTestExposure>500</MinTestExposure>
+  <TestExposureStep>200</TestExposureStep>
+  <ExportPreview>None</ExportPreview>
+  <UserParameters />
+</SliceBuildConfig>
