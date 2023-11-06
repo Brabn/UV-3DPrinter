@@ -155,9 +155,9 @@ Set of G-codes to control the printer:
 
 ## Photos
 
-![Main components assembled for testing](https://github.com/Brabn/UV-3DPrinter/blob/main/Photo/UV-3DPrinter.UV-3DPrinter.Components.jpg) 
+![Main components assembled for testing](https://github.com/Brabn/UV-3DPrinter/blob/main/Photo/UV-3DPrinter.Components.jpg) 
 
-![Main controller](https://github.com/Brabn/UV-3DPrinter/blob/main/Photo/UV-3DPrinter.UV-3DPrinter.MainController.jpg) 
+![Main controller](https://github.com/Brabn/UV-3DPrinter/blob/main/Photo/UV-3DPrinter.MainController.jpg) 
 
  
  
