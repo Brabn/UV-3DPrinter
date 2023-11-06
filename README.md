@@ -13,25 +13,33 @@ Due to the fact that the thickness of the layers is quite small, after immersion
 
 ## Printer mechanics
 The main printing table is immersed in a container with a liquid resign and mounted on ball screw gears connected to stepper motors. This allows the table to be raised and lowered with high precision. 
+
 Limit switches are installed in the upper and lower positions of the table, which signal the controller to block further movement.
+
 An ultraviolet projector with appropriate optics is installed above the table, connected to the control PC via an HDMI cable.
+
 The main controller is connected to the same PC via USB (with an emulated COM port) through which G-commands are transmitted to control the printer.
+
 The resin tank can be tilted at a small angle using a stepper motor. Limit switches are also installed in extreme positions to stop tilting
 To control the printer, a positions latching joystick is used, which allows you to raise and lower the table manually.
+
 In print mode, any movement of the joystick stops the current movement.
 In normal mode, pressing and releasing the joystick down begins moving down until the lower limit switch is activated. If during this movement you press and release the joystick up, the movement will stop. If you press and release the joystick up again, continuous upward movement will begin until the upper limit switch is activated or the joystick moves and releases down.
+
 Controls in the Creation Workshop program can also be used to control the table.
 
 ## Creation Workshop Settings
-In the Creation Workshop application, load the profile for working with the printer (Configure->Configure Slicing Profile->Machine Profile->mUVe.1.3)
-Set the layer thickness (Configure->Configure Slicing Profile->Settings->Slice Tickness (mm)->0.1)
-We set the total cycle time during which all movements of the table and plate will be made for one layer (Configure->Configure Slicing Profile->Lift and Sequence->Lift and Sequence time (ms)->8000) This time should not be less than, than the full cycle of movement of the work plate and the swinging table, configured in the firmware. Otherwise, the exposure of the next layer will begin before the table and stove return to the working point!
+In the Creation Workshop application, load the profile for working with the printer (`Configure`->`Configure Slicing Profile`->`Machine Profile`->`mUVe.1.3`)
+Set the layer thickness (`Configure`->`Configure Slicing Profile`->`Settings`->`Slice Tickness (mm)`->`0.1`)
+
+We set the total cycle time during which all movements of the table and plate will be made for one layer (`Configure->Configure Slicing Profile->Lift and Sequence->Lift and Sequence time (ms)->8000`) This time should not be less than, than the full cycle of movement of the work plate and the swinging table, configured in the firmware. Otherwise, the exposure of the next layer will begin before the table and stove return to the working point!
 
 When changing settings and before printing, each time open the 3D model and use the Slice command with the mUVe.1.3 
 
 ## Printing sequence
-At the start of printing, it is assumed that the printer is set to the zero position. You can optionally reset the controller
-At startup, exposure of the first frame begins for 1 second (change Configure->Configure Slicing Profile->Settings->Explosure time (ms)->1000). The projector then starts showing a black frame. When the lens servo shutter is used, it closes.
+At the start of printing, it is assumed that the printer is set to the zero position. You can optionally reset the controller.
+
+At startup, exposure of the first frame begins for 1 second (change `Configure`->`Configure Slicing Profile`->`ettings`->`Explosure time (ms)`->`1000``). The projector then starts showing a black frame. When the lens servo shutter is used, it closes.
 Immediately after the end of the exposure, the swinging table begins to move downward at a speed of 10 mm/sec (variable TiltDownSpeed=3200) The table stops after 2 seconds having passed 20 mm (variable StepsToRaiseLowerVat=6400)
 After 1.2 seconds from the end of the exposure (variable TimeForRaiseBuild=1200)
   lifting of the working plate begins at a speed of 2 mm/sec (variable LiftUpSpeed = 1600) The plate stops after 2 seconds having passed 4 mm (variable StepsToRaiseLowerBuildPlate = 3200)
@@ -47,9 +55,9 @@ When changing speeds and distances, you must ensure that all movements are compl
 * Processor 				– 16 MGh, ATmega2560
 * Controller memory			– 256kB + 8 kB SRAM+ 4kB EEPROM
 * Stepper motors			– Nema 17 0.4A 
-* Stepper motor torque			– 26Ncm 
+* Stepper motor torque		– 26Ncm 
 * Power supply 				– 12V 5A
-* Ball screw gears step			– 4mm
+* Ball screw gears step		– 4mm
 * Minimal printing layer thickness	– 0.00125mm
 * Exposure time				–2..8s (depends on resin, projector power and layer thickness
 
