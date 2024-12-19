@@ -1,5 +1,5 @@
 # Ultraviolet 3D Printer
-3D printer for print from resin with table swing for better mixing and manual control of table lifting
+[3D printer](https://techi-news.com/Projects/Ultraviolet-3D-Printer-with-table-swinging) for print from resin with table swing for better mixing and manual control of table lifting
 
 The part is printed from a liquid resin that hardens under the influence of ultraviolet light.
 
